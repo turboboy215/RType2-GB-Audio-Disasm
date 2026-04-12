@@ -96,22 +96,24 @@ Each channel has its own pattern. A pattern is stored as a series of pointers to
 
 Phrase Format
 =======================================
-The phrase format is comprised of the following event values:
+Each phrase is comprised of the following event values:
 
  - 00-5F = Play note
  - 60-7F = Set note length (These are added to value $A1 (161).)
  - F4 xx = Change tempo
  - F5 xx xx = Set channel pattern start/loop position and end of phrase
  - F6 xx (F6 xx yy on channel 3) (X = NRx2 value, Y = Speed) = Set envelope value (used to simulate echo effect in R-Type II continue music)
- - F7 xx = Set vibrato (this is an index value to a value in a table)
+ - F7 xx = Set vibrato (this is an index value to a value in a table) (Channel 1-3 only)
  - F8 = Rest
  - F9 = Hold note (seems to function the same as F8?)
- - FA xx = Set duty (NRx1) value
- - FB xx = Transpose all channels
- - FC xx = Transpose current channel
- - FD xx = Set sweep (NR10) (channel 1 only)
+ - FA xx = Set duty (NRx1) value (Channel 1 and 2 only)
+ - FB xx = Transpose all channels (Channel 1-3 only)
+ - FC xx = Transpose current channel (Channel 1-3 only)
+ - FD xx = Set sweep (NR10) (Channel 1 only)
  - FE = Stop playing song
  - FF = End of phrase
+
+If a channel reaches an invalid command, or a command that is at least not available for the particular channel, the CPU will freeze in an infinite loop.
 
 Waveform
 =======================================
@@ -125,6 +127,10 @@ Earlier games, including all those released prior to 1992, do not initialize the
 Of the "later" games, earlier games, including R-Type II, use the following waveform which "emulates" the Game Boy's default values:
 
 AC DD DA 48 36 02 CF 16 2C 04 E5 2C AC DD DA 48
+
+Robin Hood uses the following waveform:
+
+22 22 22 22 DD DD DD DD 44 44 44 44 DD DD DD DD
 
 For the rest of the games, the following waveform is used:
 

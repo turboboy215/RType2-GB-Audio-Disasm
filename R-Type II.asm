@@ -1515,7 +1515,7 @@ C4GetNextByte:
 
 
 .C4EventEnv
-;F6 = Set channel envelope (NR12)
+;F6 = Set channel envelope (NR42)
 ;Parameters: xx (Value)
 	;Is this the command?
 	cp $F6
@@ -5361,241 +5361,123 @@ EndString:
 
 SECTION "Audio RAM", WRAMX[AudioRAM]
 
-;$D700
 PlayFlag: ds 1
-;$D701
 C1TrigFlag: ds 1
 C2TrigFlag: ds 1
 C4TrigFlag: ds 1
-;$D704
 Tempo: ds 2
-;$D706
 RNG: ds 4
-;$D70A
 BeatCounter: ds 1
-;$D70B
 GlobalTrans: ds 1
-;$D70C
 SongPlayFlag: ds 1
-;$D70D
 C1Pos ds 2
-;$D70F
 C1Start ds 2
-;$D711
 C1PatPos ds 2
-;$D713
 C1Trans ds 1
-;$D714
 C1Len ds 1
-;$D715
 C1Delay ds 1
-;$D716
 C1Sweep ds 1
-;$D717
 C1VibPos ds 1
-;$D718
 C1Vibrato ds 1
-;$D719
 C1Freq ds 2
-;$D71B
 C1EnvLen ds 1
-;$D71C
 C1EnvDelay ds 1
-;$D71D
 C2Pos ds 2
-;$D71F
 C2Start ds 2
-;$D721
 C2PatPos ds 2
-;$D723
 C2Trans ds 1
-;$D724
 C2Len ds 1
-;$D725
 C2Delay ds 1
-;$D726
 C2Sweep ds 1
-;$D727
 C2VibPos ds 1
-;$D728
 C2Vibrato ds 1
-;$D729
 C2Freq ds 2
-;$D72B
 C2EnvLen ds 1
-;$D72C
 C2EnvDelay ds 1
-;$D72D
 C3Pos ds 2
-;$D72F
 C3Start ds 2
-;$D731
 C3PatPos ds 2
-;$D733
 C3Trans ds 1
-;$D734
 C3Len ds 1
-;$D735
 C3Delay ds 1
-;$D736
 C3Sweep ds 1
-;$D737
 C3VibPos ds 1
-;$D738
 C3Vibrato ds 1
-;$D739
 C3Freq ds 2
-;$D73B
 C3EnvLen ds 1
-;$D73C
 C3EnvDelay ds 1
-;$D73D
 C4Pos ds 2
-;$D73F
 C4Start ds 2
-;$D741
 C4PatPos ds 2
-;$D743
 C4Trans ds 1
-;$D744
 C4Len ds 1
-;$D745
 C4Delay ds 1
-;$D746
 C4Sweep ds 1
-;$D747
 C4VibPos ds 1
-;$D748
 C4Vibrato ds 1
-;$D749
 C4Freq ds 2
-;$D74B
 C4EnvLen ds 1
-;$D74C
 C4EnvDelay ds 1
-;$D74D
 Sweep ds 1
-;$D74E
 NR11Val ds 1
-;$D74F
 NR12Val ds 1
-;$D750
 NR13Val ds 1
-;$D751
 NR14Val ds 1
-;$D752
 NR21Val ds 1
-;$D753
 NR22Val ds 1
-;$D754
 NR23Val ds 1
-;$D755
 NR24Val ds 1
-;$D756
 NR30Val ds 1
-;$D757
 NR31Val ds 1
-;$D758
 NR32Val ds 1
-;$D759
 NR33Val ds 1
-;$D75A
 NR34Val ds 1
-;$D75B
 NR41Val ds 1
-;$D75C
 NR42Val ds 1
-;$D75D
 NR43Val ds 1
-;$D75E
 NR44Val ds 1
-;$D75F
 C1SFXLen ds 1
-;$D760
 C1SFXSlideCnt ds 1
-;$D761
 C1SFXFreqVal ds 2
-;$D763
 C1SFXSlideAmt ds 2
-;$D765
 C1SFXNR11Val ds 1
-;$D766
 C1SFXRNG ds 1
-;$D767
 C1SFXSign ds 1
-;$D768
 C1SFXSlideLen ds 1
-;$D769
 C1SFXNR12Val ds 1
-;$D76A
 C1SFXSlideLoop ds 1
-;$D76B
 C1SFXSpeed ds 1
-;$D76C
 C1SFXNR13Val ds 1
-;$D76D
 C1SFXNR14Val ds 1
-;$D76E
 C1SFXSlidesLeft ds 1
-;$D76F
 C1SFXTimer ds 1
-;$D770
 C2SFXLen ds 1
-;$D771
 C2SFXSlideCnt ds 1
-;$D772
 C2SFXFreqVal ds 2
-;$D774
 C2SFXSlideAmt ds 2
-;$D776
 C2SFXNR21Val ds 1
-;$D777
 C2SFXRNG ds 1
-;$D778
 C2SFXSign ds 1
-;$D779
 C2SFXSlideLen ds 1
-;$D77A
 C2SFXNR22Val ds 1
-;$D77B
 C2SFXSlideLoop ds 1
-;$D77C
 C2SFXSpeed ds 1
-;$D77D
 C2SFXNR23Val ds 1
-;$D77E
 C2SFXNR24Val ds 1
-;$D77F
 C2SFXSlidesLeft ds 1
-;$D780
 C2SFXTimer ds 1
-;$D781
 C4SFXLen ds 1
-;$D782
 C4SFXSlideCnt ds 1
-;$D783
 C4SFXFreqVal ds 2
-;$D785
 C4SFXSlideAmt ds 2
-;$D787
 C4SFXNR41Val ds 1
-;$D788
 C4SFXRNG ds 1
-;$D789
 C4SFXSign ds 1
-;$D78A
 C4SFXSlideLen ds 1
-;$D78B
 C4SFXNR42Val ds 1
-;$D78C
 C4SFXSlideLoop ds 1
-;$D78D
 C4SFXSpeed ds 1
-;$D78E
 C4SFXNR43Val ds 1
-;$D78F
 C4SFXNR44Val ds 1
-;$D790
 C4SFXSlidesLeft ds 1
-;$D791
 C4SFXTimer ds 1
