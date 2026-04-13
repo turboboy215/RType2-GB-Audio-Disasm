@@ -192,11 +192,11 @@ GetPtrs:
 	ld [C2PatPos], a
 	ld [C3PatPos], a
 	ld [C4PatPos], a
-	;Clear global transpose
+	;Clear global transpose (0)
 	xor a
 	ld [GlobalTrans], a
 	dec a
-	;Set beat counter and play flgs
+	;Set beat counter and play flags (255)
 	ld [BeatCounter], a
 	ld [SongPlayFlag], a
 	ld [PlayFlag], a
@@ -367,6 +367,7 @@ ExitAudio:
 	pop af
 	ret
 
+
 ;Check to see if the song is playing
 CheckSongPlay:
 	ld a, [PlayFlag]
@@ -488,7 +489,7 @@ PlaySongC1:
 .C1EventExit
 ;FF = End of phrase
 	;Is this the command?
-	cp $FF
+	cp exit
 	;If not, then check for next command
 	jr nz, .C1EventEnv
 
@@ -649,7 +650,7 @@ PlaySongC1:
 	;Is this the command?
 	cp $F5
 	;If not, then check for next command
-	jr nz, .C1EventStop
+	jr nz, .C1EventEnd
 
 	;Get position from pointer
 	ld a, [hl+]
@@ -671,7 +672,7 @@ PlaySongC1:
 	jp .C1GetNextByte
 
 
-.C1EventStop
+.C1EventEnd
 ;FE = Stop the channel
 	;Is this the command?
 	cp $FE
@@ -759,7 +760,7 @@ PlaySongC2:
 	ld h, a
 
 ;Get the next byte
-.C1GetNextByte
+.C2GetNextByte
 	ld a, [hl+]
 	;Is bit 7 set?
 	bit 7, a
@@ -775,7 +776,7 @@ PlaySongC2:
 .C2GetNoteLen
 	add $A1
 	ld [C2Len], a
-	jr .C1GetNextByte
+	jr .C2GetNextByte
 
 .C2GetNote
 	;Add both transpose values to note
@@ -825,7 +826,7 @@ PlaySongC2:
 
 
 .C2GetVCMD
-	ld b, $00
+	ld b, 0
 
 .C2EventExit
 ;FF = End of phrase
@@ -873,7 +874,7 @@ PlaySongC2:
 	ld c, a
 	ld l, [hl]
 	ld h, c
-	jp .C1GetNextByte
+	jp .C2GetNextByte
 
 
 .C2EventEnv
@@ -887,7 +888,7 @@ PlaySongC2:
 	;Load the parameter value into RAM
 	ld a, [hl+]
 	ld [NR22Val], a
-	jp .C1GetNextByte
+	jp .C2GetNextByte
 
 
 .C2EventVibrato
@@ -904,7 +905,7 @@ PlaySongC2:
 	;Reset vibrato sequence position
 	ld a, b
 	ld [C2VibPos], a
-	jp .C1GetNextByte
+	jp .C2GetNextByte
 
 
 .C2EventDuty
@@ -918,7 +919,7 @@ PlaySongC2:
 	;Load the parameter into RAM
 	ld a, [hl+]
 	ld [NR21Val], a
-	jp .C1GetNextByte
+	jp .C2GetNextByte
 
 
 .C2EventRest
@@ -952,7 +953,7 @@ PlaySongC2:
 
 	ld a, [hl+]
 	ld [GlobalTrans], a
-	jp .C1GetNextByte
+	jp .C2GetNextByte
 
 
 .C2EventLocalTranspose
@@ -966,7 +967,7 @@ PlaySongC2:
 	;Load the parameter into RAM
 	ld a, [hl+]
 	ld [C2Trans], a
-	jp .C1GetNextByte
+	jp .C2GetNextByte
 
 
 .C2EventLoop
@@ -975,7 +976,7 @@ PlaySongC2:
 	;Is this the command?
 	cp $F5
 	;If not, then check for next command
-	jr nz, .C2EventStop
+	jr nz, .C2EventEnd
 
 	;Get position from pointer
 	ld a, [hl+]
@@ -994,10 +995,10 @@ PlaySongC2:
 	ld c, a
 	ld h, [hl]
 	ld l, c
-	jp .C1GetNextByte
+	jp .C2GetNextByte
 
 
-.C2EventStop
+.C2EventEnd
 ;FE = Stop the channel
 	;Is this the command?
 	cp $FE
@@ -1023,7 +1024,7 @@ PlaySongC2:
 	ld a, [hl+]
 	ld [Tempo], a
 	ld [Tempo+1], a
-	jp .C1GetNextByte
+	jp .C2GetNextByte
 
 
 ;Infinite loop
@@ -1290,7 +1291,7 @@ PlaySongC3:
 	;Is this the command?
 	cp $F5
 	;If not, then check for next command
-	jr nz, .C3EventStop
+	jr nz, .C3EventEnd
 
 	;Get position from pointer
 	ld a, [hl+]
@@ -1312,7 +1313,7 @@ PlaySongC3:
 	jp .C3GetNextByte
 
 
-.C3EventStop
+.C3EventEnd
 ;FE = Stop the channel
 	;Is this the command?
 	cp $FE
@@ -1326,7 +1327,7 @@ PlaySongC3:
 	jp MusicOff
 
 
-.C3EventTempo:
+.C3EventTempo
 ;F4 = Set the tempo
 ;Parameters: xx (X = Value)
 	;Is this the command?
@@ -1386,6 +1387,7 @@ C3ProcVibrato:
 	cp $80
 	jr nz, .C3ProcVibratoUpdate
 
+	;If 80, then reset
 	xor a
 	ld [C3VibPos], a
 	ld a, [de]
@@ -1555,7 +1557,7 @@ C4GetNextByte:
 	;Is this the command?
 	cp $F5
 	;If not, then check for next command
-	jr nz, .C4EventStop
+	jr nz, .C4EventEnd
 
 	ld a, [hl+]
 	ld c, a
@@ -1576,7 +1578,7 @@ C4GetNextByte:
 	jp C4GetNextByte
 
 
-.C4EventStop
+.C4EventEnd
 ;FE = Stop the channel
 	;Is this the command?
 	cp $FE
@@ -1608,6 +1610,7 @@ C4GetNextByte:
 ;Infinite loop
 .C4InfLoop
 	jr .C4InfLoop
+	
 
 LoadSFXC1:
 	;If SFX number is larger than total, set to maximum
@@ -1648,8 +1651,8 @@ LoadSFXC1:
 	ld [C1SFXSlidesLeft], a
 	;Reset sweep
 	xor a
-	ldh [rNR10], a
 	;Set other NR1x values
+	ldh [rNR10], a
 	ld a, [C1SFXNR11Val]
 	ldh [rNR11], a
 	ld a, [C1SFXNR12Val]
@@ -1912,12 +1915,12 @@ PlaySFXC1:
 	and a
 	jr z, .C1SFXRet
 
-	;If negative, then decrease pitch
+	;If positive, then increase pitch
 	bit 7, a
-	jr z, .C1SFXDecPitch
+	jr z, .C1SFXIncPitch
 
-.C1SFXIncPitch
-	;Else, if positive, then increase pitch
+.C1SFXDecPitch
+	;Else, if negative, then decrease pitch
 	ld a, [C1SFXNR13Val]
 	ld hl, C1SFXSlideAmt
 	sub [hl]
@@ -1932,7 +1935,7 @@ PlaySFXC1:
 	ret
 
 
-.C1SFXDecPitch
+.C1SFXIncPitch
 	ld a, [C1SFXNR13Val]
 	ld hl, C1SFXSlideAmt
 	add [hl]
@@ -2083,12 +2086,12 @@ PlaySFXC2:
 	and a
 	jr z, .C2SFXRet
 
-	;If negative, then decrease pitch
+	;If positive, then increase pitch
 	bit 7, a
-	jr z, .C2SFXDecPitch
+	jr z, .C2SFXIncPitch
 
-.C2SFXIncPitch
-	;Else, if positive, then increase pitch
+.C2SFXDecPitch
+	;Else, if negative, then decrease pitch
 	ld a, [C2SFXNR23Val]
 	ld hl, C2SFXSlideAmt
 	sub [hl]
@@ -2103,7 +2106,7 @@ PlaySFXC2:
 	ret
 
 
-.C2SFXDecPitch
+.C2SFXIncPitch
 	ld a, [C2SFXNR23Val]
 	ld hl, C2SFXSlideAmt
 	add [hl]
@@ -2202,6 +2205,8 @@ PlaySFXC4:
 	and a
 	jr z, .C4SFXNoRNG
 
+.C4SFXAddRNG
+	;Otherwise, add RNG to frequency
 	ld hl, RNG
 	ld a, [C4SFXFreqVal]
 	add [hl]
@@ -2241,12 +2246,12 @@ PlaySFXC4:
 	and a
 	jr z, .C4SFXRet
 
-	;If negative, then decrease pitch
+	;If positive, then increase pitch
 	bit 7, a
-	jr z, .C4SFXDecPitch
+	jr z, .C4SFXIncPitch
 
-.C4SFXIncPitch
-	;Else, if positive, then increase pitch
+.C4SFXDecPitch
+	;Else, if negative, then decrease pitch
 	ld a, [C4SFXNR43Val]
 	ld hl, C4SFXSlideAmt
 	sub [hl]
@@ -2256,7 +2261,7 @@ PlaySFXC4:
 	ret
 
 
-.C4SFXDecPitch
+.C4SFXIncPitch
 	ld a, [C4SFXNR43Val]
 	ld hl, C4SFXSlideAmt
 	add [hl]
