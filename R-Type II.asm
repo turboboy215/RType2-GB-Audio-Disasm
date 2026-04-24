@@ -195,8 +195,8 @@ GetPtrs:
 	;Clear global transpose (0)
 	xor a
 	ld [GlobalTrans], a
-	dec a
 	;Set beat counter and play flags (255)
+	dec a
 	ld [BeatCounter], a
 	ld [SongPlayFlag], a
 	ld [PlayFlag], a
@@ -211,8 +211,10 @@ SetNRVals:
 	;If not, then return
 	jr z, .SetNRValsRet
 
+	;Then check if any audio is playing
 	ld a, [PlayFlag]
 	and a
+	;If not, then return
 	jr nz, .SetNRValsRet
 
 	;If music is playing, then set values
@@ -257,8 +259,8 @@ SetNRVals:
 
 
 InitRoutine:
-	xor a
 	;Clear variables
+	xor a
 	ld [PlayFlag], a
 	ld [C1TrigFlag], a
 	ld [C2TrigFlag], a
@@ -292,7 +294,7 @@ Init2:
 	;Set panning
 	ld a, %11111111
 	ldh [rNR51], a
-	;Enable audio 
+	;Enable audio
 	ld a, %10000000
 	ldh [rNR52], a
 	ret
@@ -489,7 +491,7 @@ PlaySongC1:
 .C1EventExit
 ;FF = End of phrase
 	;Is this the command?
-	cp exit
+	cp $FF
 	;If not, then check for next command
 	jr nz, .C1EventEnv
 
@@ -594,7 +596,7 @@ PlaySongC1:
 
 
 .C1EventTie
-;F9 = Delay the next note for the current note duration (actually seems to function same as F8?)
+;F9 = Delay the next note for the current note duration
 	;Is this the command?
 	cp $F9
 	;If not, then check for next command
@@ -610,6 +612,7 @@ PlaySongC1:
 	;If not, then check for next command
 	jr nz, .C1EventGlobalTranspose
 
+	;Load the parameter into RAM
 	ld a, [hl+]
 	ld [Sweep], a
 	ld [C1Sweep], a
@@ -934,7 +937,7 @@ PlaySongC2:
 
 
 .C2EventTie
-;F9 = Delay the next note for the current note duration (actually seems to function same as F8?)
+;F9 = Delay the next note for the current note duration
 	;Is this the command?
 	cp $F9
 	;If not, then check for next command
@@ -951,6 +954,7 @@ PlaySongC2:
 	;If not, then check for next command
 	jr nz, .C2EventLocalTranspose
 
+	;Load the parameter into RAM
 	ld a, [hl+]
 	ld [GlobalTrans], a
 	jp .C2GetNextByte
@@ -1241,6 +1245,7 @@ PlaySongC3:
 	;If not, then check for next command
 	jr nz, .C3EventTie
 
+	;Key off channel
 	xor a
 	ld [C3EnvDelay], a
 	ldh [rNR32], a
@@ -1248,7 +1253,7 @@ PlaySongC3:
 
 
 .C3EventTie
-;F9 = Delay the next note for the current note duration (actually seems to function same as F8?)
+;F9 = Delay the next note for the current note duration
 	;Is this the command?
 	cp $F9
 	;If not, then check for next command
@@ -1342,6 +1347,7 @@ PlaySongC3:
 	jp .C3GetNextByte
 
 
+;Infinite loop
 .C3InfLoop
 	jr .C3InfLoop
 
@@ -1418,7 +1424,7 @@ PlaySongC4:
 	ld h, a
 
 ;Get the next byte
-C4GetNextByte:
+.C4GetNextByte
 	ld a, [hl+]
 	;Is bit 7 set?
 	bit 7, a
@@ -1434,7 +1440,7 @@ C4GetNextByte:
 .C4GetNoteLen
 	add $A1
 	ld [C4Len], a
-	jr C4GetNextByte
+	jr .C4GetNextByte
 
 .C4GetNote
 	ld [NR43Val], a
@@ -1513,7 +1519,7 @@ C4GetNextByte:
 	ld c, a
 	ld l, [hl]
 	ld h, c
-	jp C4GetNextByte
+	jp .C4GetNextByte
 
 
 .C4EventEnv
@@ -1527,7 +1533,7 @@ C4GetNextByte:
 	;Load the parameter value into RAM
 	ld a, [hl+]
 	ld [NR42Val], a
-	jp C4GetNextByte
+	jp .C4GetNextByte
 
 
 .C4EventRest
@@ -1542,7 +1548,7 @@ C4GetNextByte:
 
 
 .C4EventTie
-;F9 = Delay the next note for the current note duration (actually seems to function same as F8?)
+;F9 = Delay the next note for the current note duration
 	;Is this the command?
 	cp $F9
 	;If not, then check for next command
@@ -1575,7 +1581,7 @@ C4GetNextByte:
 	ld c, a
 	ld h, [hl]
 	ld l, c
-	jp C4GetNextByte
+	jp .C4GetNextByte
 
 
 .C4EventEnd
@@ -1604,7 +1610,7 @@ C4GetNextByte:
 	ld a, [hl+]
 	ld [Tempo], a
 	ld [Tempo+1], a
-	jp C4GetNextByte
+	jp .C4GetNextByte
 
 
 ;Infinite loop
@@ -2193,7 +2199,7 @@ PlaySFXC4:
 	ret
 
 
-.C4SFXCheckSlideLen:
+.C4SFXCheckSlideLen
 	;Get remaining length of slide
 	ld hl, C4SFXSlideLen
 	dec [hl]
@@ -2203,6 +2209,7 @@ PlaySFXC4:
 	;Check for RNG flag
 	ld a, [C4SFXRNG]
 	and a
+	;If 0, then skip
 	jr z, .C4SFXNoRNG
 
 .C4SFXAddRNG
@@ -3466,7 +3473,8 @@ SongTab:
 	dw TitleA, TitleB, TitleC, TitleD
 
 SongEmpty:
-	dw EmptyPhrase, 0
+	dw EmptyPhrase
+	dw 0
 
 ContinueA:
 	dw ContinuePhrase01
