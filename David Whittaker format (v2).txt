@@ -105,7 +105,7 @@ Each phrase is comprised of the following event values:
  - F6 xx (F6 xx yy on channel 3) (X = NRx2 value, Y = Speed) = Set envelope value (used to simulate echo effect in R-Type II continue music)
  - F7 xx = Set vibrato (this is an index value to a value in a table) (Channel 1-3 only)
  - F8 = Rest
- - F9 = Hold note (seems to function the same as F8?)
+ - F9 = Hold note (functions the same as F8 on all channels except 3)
  - FA xx = Set duty (NRx1) value (Channel 1 and 2 only)
  - FB xx = Transpose all channels (Channel 1-3 only)
  - FC xx = Transpose current channel (Channel 1-3 only)
